@@ -18,5 +18,5 @@
    - [ ] Sign out
 5. Apply business logic to handle illegaloperations in:
    - [ ] login system
-   - [ ] \(Optional) Transactions (withdrawls /depsosits, etc.)
+   - [ ] Transactions (withdrawls /depsosits, etc.)
 6. Use JDBC and DAO to connect user info to a database.
