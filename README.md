@@ -10,7 +10,7 @@
 2. Create a user login system.
 3. Once logged in, have a user menu display in console.
 4. Allow user to make:
-   - [ ] Deposit
+   - [x] Deposit
    - [ ] Withdrawl
    - [ ] Funds Transfer
    - [ ] 5 recent transaction history
