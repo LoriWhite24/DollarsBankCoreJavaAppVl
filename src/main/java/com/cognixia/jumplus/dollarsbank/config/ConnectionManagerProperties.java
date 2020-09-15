@@ -55,6 +55,14 @@ public class ConnectionManagerProperties {
 		return connection;
 	}
 	
+	public static void close() {
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		
