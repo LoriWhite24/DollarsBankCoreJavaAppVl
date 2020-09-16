@@ -7,11 +7,18 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * The database connection manager for this app.
+ * @author Lori White
+ * @version v1 (09/14/2020)
+ */
 public class ConnectionManagerProperties {
 	
 	private static Connection connection = null;
 	
-	
+	/**
+	 * Makes a connection to a sql server that is specified in the config.properties file. 
+	 */
 	private static void makeConnection() {
 		
 		Properties props = new Properties();
@@ -43,9 +50,10 @@ public class ConnectionManagerProperties {
 		
 		
 	}
-	
-	
-	// returning connection
+	/**
+	 * Retrieves the current sql server connection.
+	 * @return Connection - the current sql server connection
+	 */
 	public static Connection getConnection() {
 
 		if (connection == null) { // if connection not established, create it before returning it
@@ -62,8 +70,10 @@ public class ConnectionManagerProperties {
 			e.printStackTrace();
 		}
 	}
-	
-	
+	/**
+	 * Tests the integration of this class's getConnection function with the sql server provided in config.properties.
+	 * @param args the command line arguments
+	 */
 	public static void main(String[] args) {
 		
 		Connection conn = ConnectionManagerProperties.getConnection();
