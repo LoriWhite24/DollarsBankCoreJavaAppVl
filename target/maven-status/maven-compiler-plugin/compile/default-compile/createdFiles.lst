@@ -5,9 +5,9 @@ com\cognixia\jumplus\dollarsbank\model\CustomerAccount.class
 com\cognixia\jumplus\dollarsbank\config\ConnectionManagerProperties.class
 com\cognixia\jumplus\dollarsbank\model\Account.class
 com\cognixia\jumplus\dollarsbank\controller\TransactionController.class
+com\cognixia\jumplus\dollarsbank\controller\AccountController.class
 com\cognixia\jumplus\dollarsbank\model\Transaction.class
 com\cognixia\jumplus\dollarsbank\dao\CustomerDAO.class
-com\cognixia\jumplus\dollarsbank\controller\CheckingAccountController.class
 com\cognixia\jumplus\dollarsbank\model\Customer.class
 com\cognixia\jumplus\dollarsbank\utility\AccountNumberGeneratorUtility.class
 com\cognixia\jumplus\dollarsbank\utility\DatabaseSetupUtility.class
@@ -19,7 +19,6 @@ com\cognixia\jumplus\dollarsbank\model\Address.class
 com\cognixia\jumplus\dollarsbank\controller\AddressController.class
 com\cognixia\jumplus\dollarsbank\dao\AddressDAO.class
 com\cognixia\jumplus\dollarsbank\App.class
-com\cognixia\jumplus\dollarsbank\controller\SavingsAccountController.class
 com\cognixia\jumplus\dollarsbank\Main.class
 com\cognixia\jumplus\dollarsbank\dao\CustomerAccountDAO.class
 com\cognixia\jumplus\dollarsbank\model\CheckingAccount.class

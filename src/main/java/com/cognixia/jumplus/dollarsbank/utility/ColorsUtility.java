@@ -17,7 +17,7 @@ public class ColorsUtility {
 	 * @param header the header to print
 	 */
 	public static void colorHeader(String header) {
-		AnsiFormat fFormat = new AnsiFormat(Attribute.BLUE_TEXT(), Attribute.BOLD());
+		AnsiFormat fFormat = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT(), Attribute.BOLD());
 		System.out.println(fFormat.format(header));
 	}
 	/**
