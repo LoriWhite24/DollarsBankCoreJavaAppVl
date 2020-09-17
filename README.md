@@ -15,8 +15,8 @@
    - [ ] Funds Transfer
    - [ ] 5 recent transaction history
    - [ ] Display customer information
-   - [ ] Sign out
+   - [X] Sign out
 5. Apply business logic to handle illegaloperations in:
-   - [ ] login system
+   - [X] login system
    - [ ] Transactions (withdrawls /depsosits, etc.)
 6. Use JDBC and DAO to connect user info to a database.
