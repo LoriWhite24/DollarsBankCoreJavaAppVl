@@ -16,8 +16,8 @@ public abstract class Account {
 	public enum AccountType {
 		CHECKING("CHECKING_ACCOUNT", 0.0006), SAVINGS("SAVINGS_ACCOUNT", 0.0009);
 		
-		private String value;
-		private Double interestRate;
+		private final String value;
+		private final Double interestRate;
 		/**
 		 * Overloaded constructor.
 		 * @param value the String value of the account type

@@ -16,7 +16,7 @@ public class Transaction {
 	public enum TransactionType {
 		DEPOSIT("DEPOSIT"), WITHDRAW("WITHDRAW"), TRANSFER("TRANSFER");
 		
-		private String value;
+		public final String value;
 		/**
 		 * Overloaded constructor.
 		 * @param value the String value of the transaction type

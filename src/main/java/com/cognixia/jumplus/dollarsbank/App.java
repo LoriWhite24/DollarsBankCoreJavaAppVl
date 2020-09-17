@@ -4,8 +4,6 @@ import java.awt.GraphicsEnvironment;
 import java.io.Console;
 import java.io.IOException;
 
-import com.cognixia.jumplus.dollarsbank.utility.DatabaseSetupUtility;
-
 /**
  * Dollars Bank Core Java Application version 1
  * @author Lori White
@@ -28,9 +26,7 @@ public class App
 				e.printStackTrace();
 			}
         }
-        System.out.println( "Hello World!" );
-        DatabaseSetupUtility.setup("src/main/resources/dollars_bank.sql");
-        System.out.println( "Bye." );
+        Main.main(new String[0]);
         Runtime.getRuntime().exec("taskkill /f /im cmd.exe");
     }
 }
