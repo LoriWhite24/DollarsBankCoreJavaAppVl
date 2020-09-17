@@ -34,12 +34,12 @@ public class DatabaseSetupUtility {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		clrscr();
+		//clrscr();
 	}
 	/**
 	 * Clears the console in command line.
 	 */
-    private static void clrscr(){
+    public static void clrscr(){
 
         //Clears Screen in java
 

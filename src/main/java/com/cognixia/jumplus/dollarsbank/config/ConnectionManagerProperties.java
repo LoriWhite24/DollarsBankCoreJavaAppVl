@@ -23,22 +23,29 @@ public class ConnectionManagerProperties {
 		
 		Properties props = new Properties();
 		
-		try {
-			props.load(new FileInputStream("src/main/resources/config.properties"));
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
+		/*
+		 * try { props.load(new
+		 * FileInputStream("src/main/resources/config.properties"));
+		 * 
+		 * } catch (IOException e) {
+		 * 
+		 * try { props.load(new FileInputStream("./config.properties"));
+		 * 
+		 * } catch (IOException r) {
+		 * 
+		 * r.printStackTrace(); } }
+		 */
 		
-		String url = props.getProperty("url");
-		String username = props.getProperty("username");
-		String password = props.getProperty("password");
+		/*
+		 * String url = props.getProperty("url"); String username =
+		 * props.getProperty("username"); String password =
+		 * props.getProperty("password");
+		 */
 		
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			
-			connection = DriverManager.getConnection(url, username, password);
+			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/", "root", "root");
 			
 		} catch (SQLException e) {
 			

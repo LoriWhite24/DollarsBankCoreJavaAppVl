@@ -38,8 +38,8 @@ public class Main {
 	public static void main(String[] args) {
 		boolean quit = false, loggedIn = false;
 		int response;
-		
-        DatabaseSetupUtility.setup("src/main/resources/dollars_bank.sql");
+		DatabaseSetupUtility.clrscr();
+        //DatabaseSetupUtility.setup(".\\dollars_bank.sql");
         do {
         	ConsolePrinterUtility.header("top");
         	ConsolePrinterUtility.menu("top");
@@ -96,7 +96,6 @@ public class Main {
         	}
         } while(!quit);
         in.close();
-        System.out.println( "Bye." );
 	}
 	/**
 	 * 
