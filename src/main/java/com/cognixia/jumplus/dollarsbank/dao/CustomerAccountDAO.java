@@ -1,5 +1,25 @@
 package com.cognixia.jumplus.dollarsbank.dao;
 
-public interface CustomerAccountDAO {
+import java.util.List;
 
+import com.cognixia.jumplus.dollarsbank.model.CustomerAccount;
+
+/**
+ * The DAO for customer_account.
+ * @author Lori White
+ * @version v1 (09/16/2020)
+ */
+public interface CustomerAccountDAO {
+	/**
+	 * Retrieves a list of customer-account objects by a customer id.
+	 * @param customerId the customer's id to search for
+	 * @return List - the list of customer-account objects by a customer id.
+	 */
+	public List<CustomerAccount> getByCustomer(String customerId);
+	/**
+	 * Retrieves a list of customer-account objects by an account id.
+	 * @param accountId the account's id to search for
+	 * @return List - the list of customer-account objects by an account id.
+	 */
+	public List<CustomerAccount> getByAccount(String accountId);
 }

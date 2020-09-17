@@ -62,14 +62,6 @@ public class ConnectionManagerProperties {
 
 		return connection;
 	}
-	
-	public static void close() {
-		try {
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
 	/**
 	 * Tests the integration of this class's getConnection function with the sql server provided in config.properties.
 	 * @param args the command line arguments
