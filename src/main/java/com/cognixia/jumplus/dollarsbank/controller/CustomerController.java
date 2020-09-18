@@ -140,4 +140,44 @@ public class CustomerController implements CustomerDAO{
 		
 		return null;
 	}
+	/**
+	 * Retrieves a customer by email.
+	 * @param email the customer email to search by
+	 * @return Customer - the customer found by email
+	 */
+	@Override
+	public Customer getByEmail(String email) {
+		Customer customer = null;
+
+		// select * from student where student_id = ?
+		try(PreparedStatement pstmt = conn.prepareStatement("select * from dollars_bank.customer where email = ?")) {
+
+			pstmt.setString(1, email);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			if(rs.next()) {
+				
+				customer = new Customer(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7));
+
+			}
+
+			pstmt.close();
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+
+
+		return customer;
+	}
+	/**
+	 * Finds whether a customer exists by an email. 
+	 * @param email the customer email to search by
+	 * @return boolean - whether a customer exists by an email
+	 */
+	@Override
+	public boolean existsByEmail(String email) {
+		return getByEmail(email) != null;
+	}
 }

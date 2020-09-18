@@ -30,7 +30,7 @@ public class ConsolePrinterUtility {
 			header = "+------------------+\n| Customer Details |\n+------------------+";
 			break;
 		case "transactions":
-			header = "+-----------------------+\n| 5 Recent Transactions |\n+-----------------------+";
+			header = "+---------------------+\n| Recent Transactions |\n+---------------------+";
 			break;
 		case "deposit":
 			header = "+---------+\n| Deposit |\n+---------+";

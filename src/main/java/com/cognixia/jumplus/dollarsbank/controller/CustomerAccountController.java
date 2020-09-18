@@ -70,4 +70,42 @@ public class CustomerAccountController implements CustomerAccountDAO{
 
 		return customerAccountList;
 	}
+	/**
+	 * Adds a customer linked to an account.
+	 * @param customerAccount the customer linked to an account
+	 * @return CustomerAccount - the added customer linked to an account
+	 */
+	@Override
+	public CustomerAccount add(CustomerAccount customerAccount) {
+		try {
+			PreparedStatement pstmt = conn.prepareStatement("insert into dollars_bank.customer_account values(?,?,?)");
+
+			pstmt.setInt(1, customerAccount.getCustomerAccountId());
+			pstmt.setString(2, customerAccount.getCustomerId());
+			pstmt.setString(3, customerAccount.getAccountId());
+
+			int insert = pstmt.executeUpdate();
+
+			if(insert > 0) {
+				try(PreparedStatement stmt = conn.prepareStatement("select count(*) from dollars_bank.customer_account")) {
+					ResultSet rs = stmt.executeQuery();
+					while(rs.next()) {
+						customerAccount.setCustomerAccountId(rs.getInt(1) + 1);
+					}
+					stmt.close();
+					return customerAccount;
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+
+			pstmt.close();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

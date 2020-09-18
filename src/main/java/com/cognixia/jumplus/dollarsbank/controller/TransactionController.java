@@ -29,7 +29,7 @@ public class TransactionController implements TransactionDAO{
 		List<Transaction> transactionList = new ArrayList<Transaction>();
 		TransactionType type = null;
 		
-		try(PreparedStatement pstmt = conn.prepareStatement("select * from dollars_bank.transaction where account_id = ?")) { 
+		try(PreparedStatement pstmt = conn.prepareStatement("select * from dollars_bank.transaction where account_id = ? order by timestamp desc")) { 
 			
 			pstmt.setString(1,  accountId);
 			

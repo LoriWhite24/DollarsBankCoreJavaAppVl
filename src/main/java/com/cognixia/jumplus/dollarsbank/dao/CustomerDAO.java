@@ -21,6 +21,18 @@ public interface CustomerDAO {
 	 */
 	public boolean existsById(String id);
 	/**
+	 * Retrieves a customer by email.
+	 * @param email the customer email to search by
+	 * @return Customer - the customer found by email
+	 */
+	public Customer getByEmail(String email);
+	/**
+	 * Finds whether a customer exists by an email. 
+	 * @param email the customer email to search by
+	 * @return boolean - whether a customer exists by an email
+	 */
+	public boolean existsByEmail(String email);
+	/**
 	 * Updates a customer.
 	 * @param customer the customer to update
 	 * @param column the specific column to update or if null update all
