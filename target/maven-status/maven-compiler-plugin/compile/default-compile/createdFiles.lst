@@ -22,5 +22,6 @@ com\cognixia\jumplus\dollarsbank\App.class
 com\cognixia\jumplus\dollarsbank\Main.class
 com\cognixia\jumplus\dollarsbank\dao\CustomerAccountDAO.class
 com\cognixia\jumplus\dollarsbank\model\CheckingAccount.class
+com\cognixia\jumplus\dollarsbank\Main$1.class
 com\cognixia\jumplus\dollarsbank\controller\CustomerController.class
 com\cognixia\jumplus\dollarsbank\dao\AccountDAO.class

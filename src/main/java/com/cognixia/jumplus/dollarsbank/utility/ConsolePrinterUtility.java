@@ -41,23 +41,25 @@ public class ConsolePrinterUtility {
 		case "transfer":
 			header = "+----------+\n| Transfer |\n+----------+";
 			break;
+		case "account":
+			header = "+---------------+\n| Your Accounts |\n+---------------+";
+			break;
 		}
 		ColorsUtility.colorHeader(header);
 	}
 	/**
 	 * Generates the menuChoice, colors, and then prints it to the menuChoice.
-	 * @param choice the menuChoice type
+	 * @param numChoice the number of choices
 	 */
-	public static void menuChoice(String choice) {
-		String menuChoice = "";
+	public static void menuChoice(int numChoice) {
+		String menuChoice = "Enter Choice (";
 		
-		switch(choice) {
-		case "top":
-			menuChoice = "Enter Choice (1, 2, or 3):";
-			break;
-		case "logged_in":
-			menuChoice = "Enter Choice (1, 2, 3, 4, 5, or 6):";
-			break;
+		for(int i = 1; i <= numChoice; i++) {
+			if(i == numChoice) {
+				menuChoice += "or " + i + "):";
+			} else {
+				menuChoice += i + ", ";
+			}
 		}
 		ColorsUtility.colorChoice(menuChoice);
 	}
@@ -94,6 +96,9 @@ public class ConsolePrinterUtility {
 			break;
 		case "number_of_accounts":
 			error = "You do not have enough bank accounts to make a transfer, please create a new account first.";
+			break;
+		case "transaction":
+			error = "Invalid Transaction.";
 			break;
 		}
 		ColorsUtility.colorError(error);
