@@ -343,7 +343,6 @@ public class Main {
         Matcher matcher;
         Address address;
         Account account = null;
-        Customer cust;
 		
 		do {
 			ColorsUtility.colorDefault("User Id: (must be at least 8 characters)");
@@ -442,7 +441,7 @@ public class Main {
 			address = addressRepo.add(new Address(0, street, city, state, zip));
 		}
 		
-		cust = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
+		current = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
 		
 		switch(accountType.charAt(0)) {
 		case 'c':
@@ -455,9 +454,9 @@ public class Main {
 		
 		account = accountRepo.add(account);
 		
-		customerAccountRepo.add(new CustomerAccount(0, cust.getUserId(), account.getAccountNumber()));
+		customerAccountRepo.add(new CustomerAccount(0, current.getUserId(), account.getAccountNumber()));
 		
-		transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", cust.getUserId(), account.getAccountNumber()));
+		transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", current.getUserId(), account.getAccountNumber()));
 		
 		return true;
 	}

@@ -43,7 +43,7 @@ public class AddressController implements AddressDAO{
 	/**
 	 * Retrieves an address by a street and a zipcode.
 	 * @param street the street to search by
-	 * @param zip the zipcode to search by
+	 * @param zipcode the zipcode to search by
 	 * @return Address - the address found by a street and a zipcode
 	 */
 	@Override

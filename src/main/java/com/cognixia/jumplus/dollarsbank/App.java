@@ -14,6 +14,7 @@ public class App
 	/**
 	 * The main entry point for this App.
 	 * @param args the command line arguments
+	 * @throws IOException for input and output errors
 	 */
     public static void main( String[] args ) throws IOException
     {
