@@ -13,8 +13,8 @@
    - [ ] Deposit
    - [ ] Withdrawl
    - [ ] Funds Transfer
-   - [ ] 5 recent transaction history
-   - [ ] Display customer information
+   - [x] 5 recent transaction history
+   - [x] Display customer information
    - [X] Sign out
 5. Apply business logic to handle illegaloperations in:
    - [X] login system
