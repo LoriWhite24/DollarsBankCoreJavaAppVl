@@ -24,7 +24,7 @@
    - [ ] View All Accounts
    - [ ] Open a new Account
    - [ ] Close an existing Account
-   - [ ] Customer Profile
+   - [ ] Update Customer Profile
    - [ ] Open a new Account with another existing customer
 
 ### Running dollarsbank.jar:
