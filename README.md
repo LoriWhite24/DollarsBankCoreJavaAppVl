@@ -15,13 +15,13 @@
    - [x] Funds Transfer
    - [x] Recent transaction history
    - [x] Display customer information
-   - [X] Sign out
+   - [x] Sign out
 5. Apply business logic to handle illegaloperations in:
-   - [X] login system
+   - [x] login system
    - [x] Transactions (withdrawls /depsosits, etc.)
 6. Use JDBC and DAO to connect user info to a database.
 7. Extra Features:
-   - [ ] View All Accounts
+   - [x] View All Accounts
    - [ ] Open a new Account
    - [ ] Close an existing Account
    - [ ] Update Customer Profile
