@@ -1,5 +1,7 @@
 package com.cognixia.jumplus.dollarsbank.utility;
 
+import java.util.List;
+
 /**
  * The utility for storing reusable output formating for this app.
  * @author Lori White
@@ -21,7 +23,7 @@ public class ConsolePrinterUtility {
 			header = "+-------------------+\n| Welcome Customer! |\n+-------------------+";
 			break;
 		case "new_account":
-			header = "+-------------------------------+\n| Enter Details for New Account |\n+-------------------------------+";
+			header = "+---------------------------------------------+\n| Enter Details for New User and Bank Account |\n+---------------------------------------------+";
 			break;
 		case "login":
 			header = "+---------------------+\n| Enter Login Details |\n+---------------------+";
@@ -41,8 +43,11 @@ public class ConsolePrinterUtility {
 		case "transfer":
 			header = "+----------+\n| Transfer |\n+----------+";
 			break;
-		case "account":
+		case "accounts":
 			header = "+---------------+\n| Your Accounts |\n+---------------+";
+			break;
+		case "account":
+			header = "+------------------+\n| Choose an Action |\n+------------------+";
 			break;
 		}
 		ColorsUtility.colorHeader(header);
@@ -67,16 +72,13 @@ public class ConsolePrinterUtility {
 	 * Generates the menu, colors, and then prints it to the menu.
 	 * @param choice the menu type
 	 */
-	public static void menu(String choice) {
+	public static void menu(List<String> choices) {
 		String menu = "";
-		
-		switch(choice) {
-		case "top":
-			menu = "1. Create New Account\n2. Login\n3. Exit";
-			break;
-		case "logged_in":
-			menu = "1. Deposit Amount\n2. Withdraw Amount\n3. Funds Transfer\n4. View 5 Recent Transactions\n5. Display Customer Information\n6. Sign Out";
-			break;
+		for(int i = 1; i <= choices.size(); i++) {
+			menu += i + ". " + choices.get(i - 1);
+			if(i != choices.size()) {
+				menu += "\n";
+			}
 		}
 		ColorsUtility.colorMenu(menu);
 	}

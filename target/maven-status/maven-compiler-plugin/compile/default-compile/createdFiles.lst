@@ -1,4 +1,5 @@
 com\cognixia\jumplus\dollarsbank\model\Account$AccountType.class
+com\cognixia\jumplus\dollarsbank\Main$3.class
 com\cognixia\jumplus\dollarsbank\model\SavingsAccount.class
 com\cognixia\jumplus\dollarsbank\utility\ColorsUtility.class
 com\cognixia\jumplus\dollarsbank\model\CustomerAccount.class
@@ -8,6 +9,7 @@ com\cognixia\jumplus\dollarsbank\controller\TransactionController.class
 com\cognixia\jumplus\dollarsbank\controller\AccountController.class
 com\cognixia\jumplus\dollarsbank\model\Transaction.class
 com\cognixia\jumplus\dollarsbank\dao\CustomerDAO.class
+com\cognixia\jumplus\dollarsbank\Main$2.class
 com\cognixia\jumplus\dollarsbank\model\Customer.class
 com\cognixia\jumplus\dollarsbank\utility\AccountNumberGeneratorUtility.class
 com\cognixia\jumplus\dollarsbank\utility\DatabaseSetupUtility.class
@@ -17,6 +19,7 @@ com\cognixia\jumplus\dollarsbank\model\Transaction$TransactionType.class
 com\cognixia\jumplus\dollarsbank\dao\TransactionDAO.class
 com\cognixia\jumplus\dollarsbank\model\Address.class
 com\cognixia\jumplus\dollarsbank\controller\AddressController.class
+com\cognixia\jumplus\dollarsbank\Main$4.class
 com\cognixia\jumplus\dollarsbank\dao\AddressDAO.class
 com\cognixia\jumplus\dollarsbank\App.class
 com\cognixia\jumplus\dollarsbank\Main.class

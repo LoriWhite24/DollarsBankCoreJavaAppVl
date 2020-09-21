@@ -17,7 +17,7 @@ public class ColorsUtility {
 	 * @param header the header to print
 	 */
 	public static void colorHeader(String header) {
-		AnsiFormat fFormat = new AnsiFormat(Attribute.BRIGHT_BLUE_TEXT(), Attribute.BOLD());
+		AnsiFormat fFormat = new AnsiFormat(Attribute.TEXT_COLOR(33), Attribute.BOLD());
 		System.out.println(fFormat.format(header));
 	}
 	/**
@@ -25,7 +25,7 @@ public class ColorsUtility {
 	 * @param choice the choice prompt to print
 	 */
 	public static void colorChoice(String choice) {
-		AnsiFormat fWarning = new AnsiFormat(Attribute.GREEN_TEXT());
+		AnsiFormat fWarning = new AnsiFormat(Attribute.TEXT_COLOR(46));
 		System.out.println(fWarning.format(choice));
 	}
 	/**
@@ -33,7 +33,7 @@ public class ColorsUtility {
 	 * @param error the error to print
 	 */
 	public static void colorError(String error) {		
-		AnsiFormat fError = new AnsiFormat(Attribute.RED_BACK(), Attribute.WHITE_TEXT());
+		AnsiFormat fError = new AnsiFormat(Attribute.BACK_COLOR(196), Attribute.TEXT_COLOR(15));
 		System.out.println(fError.format(error));
 	}
 	/**
@@ -49,7 +49,7 @@ public class ColorsUtility {
 	 * @param output the output to print
 	 */
 	public static void colorOutput(String output) {
-		AnsiFormat fInfo = new AnsiFormat(Attribute.CYAN_TEXT());
+		AnsiFormat fInfo = new AnsiFormat(Attribute.TEXT_COLOR(51));
 		System.out.println(fInfo.format(output));
 	}
 	/**
@@ -57,7 +57,7 @@ public class ColorsUtility {
 	 * @param menu the menu choices to print
 	 */
 	public static void colorMenu(String menu) {
-		AnsiFormat fFormat = new AnsiFormat(Attribute.MAGENTA_TEXT());
+		AnsiFormat fFormat = new AnsiFormat(Attribute.TEXT_COLOR(165));
 		System.out.println(fFormat.format(menu));
 	}
 	/**

@@ -3,6 +3,7 @@ package com.cognixia.jumplus.dollarsbank;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -44,27 +45,34 @@ public class Main {
 	private static TransactionDAO transactionRepo = new TransactionController();
 	
 	private static Scanner in = new Scanner(System.in);
-	private static Customer current = null;
+	private static Customer currentCustomer = null;
+	private static Account currentAccount = null;
+	private static List<CustomerAccount> currentCustomerAccounts = null;
 	
+	@SuppressWarnings("serial")
+	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Back");}};
+	private static DecimalFormat df = new DecimalFormat("#,###,##0.00");
+	private static final int minChoice = 1;
 	/**
 	 * The second entry point for this App.
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		boolean quit = false, loggedIn = false;
-		int response, choice;
-		DatabaseSetupUtility.clrscr();
+		boolean quit = false, loggedIn = false, wentToAccounts = false, selectedAccount = false;
+		int response;
+		
         //DatabaseSetupUtility.setup(".\\dollars_bank.sql");
         do {
+        	DatabaseSetupUtility.clrscr();
         	ConsolePrinterUtility.header("top");
-        	ConsolePrinterUtility.menu("top");
+        	ConsolePrinterUtility.menu(topMenu);
         	do {
-        		ConsolePrinterUtility.menuChoice(3);
+        		ConsolePrinterUtility.menuChoice(topMenu.size());
             	response = Integer.parseInt(in.nextLine().trim());
-            	if(response > 3 || response < 1) {
+            	if(response > topMenu.size() || response < minChoice) {
             		ConsolePrinterUtility.error("input");
             	}
-        	} while(response > 3 || response < 1);
+        	} while(response > topMenu.size() || response < minChoice);
         	switch(response) {
         	case 1:
         		ConsolePrinterUtility.header("new_account");
@@ -81,36 +89,84 @@ public class Main {
         	if(loggedIn) {
         		do {
         			ConsolePrinterUtility.header("logged_in");
-        			ConsolePrinterUtility.menu("logged_in");
+        			ConsolePrinterUtility.menu(loggedInMenu);
         			do {
-        				ConsolePrinterUtility.menuChoice(6);
-        				choice = Integer.parseInt(in.nextLine().trim());
-        				if(choice > 6 || choice < 1) {
+        				ConsolePrinterUtility.menuChoice(loggedInMenu.size());
+        				response = Integer.parseInt(in.nextLine().trim());
+        				if(response > loggedInMenu.size() || response < minChoice) {
         					ConsolePrinterUtility.error("input");
         				}
-        			} while(choice > 6 || choice < 1);
-        			switch(choice) {
+        			} while(response > loggedInMenu.size() || response < minChoice);
+        			switch(response) {
         			case 1:
-        				transaction(TransactionType.DEPOSIT);
-        				break;
-        			case 2: 				
-        				transaction(TransactionType.WITHDRAW);
-        				break;
-        			case 3:
-        				transaction(TransactionType.TRANSFER);
-        				break;
-        			case 4:
-        				ConsolePrinterUtility.header("transactions");
-        				viewTransactions();
-        				break;
-        			case 5:
         				ConsolePrinterUtility.header("customer");
         				displayCustomer();
         				break;
-        			case 6:
-        				loggedIn = false;
-        				current = null;
+        			case 2: 
+        				wentToAccounts = true;
+        				currentCustomerAccounts = customerAccountRepo.getByCustomer(currentCustomer.getUserId());
+        				for(CustomerAccount ca : currentCustomerAccounts) {
+        					accounts.add(ca.getAccountId());
+        				}
+        				accounts.add("Back");
         				break;
+        			case 3:
+        				loggedIn = false;
+        				currentCustomer = null;
+        				break;
+        			}
+        			if(wentToAccounts) {
+        				do {
+        					ConsolePrinterUtility.header("accounts");
+        					do {
+        						ConsolePrinterUtility.menu(accounts);
+        						ConsolePrinterUtility.menuChoice(accounts.size());
+        						response = Integer.parseInt(in.nextLine().trim());
+        						if(response < minChoice || response > accounts.size()) {
+        							ConsolePrinterUtility.error("input");
+        						}
+        					} while(response < minChoice || response > accounts.size());
+        					if(response == accounts.size()) {
+        						accounts.removeAll(accounts);
+        						currentCustomerAccounts = null;
+        						wentToAccounts = false;
+        					} else {
+            					currentAccount = accountRepo.getByNumber(currentCustomerAccounts.get(response - 1).getAccountId());
+            					selectedAccount = true;
+            					do {
+            						ColorsUtility.colorDefault("Account " + currentAccount.getAccountNumber() + ":");
+            						ColorsUtility.colorOutput("Type: " + currentAccount.getType().getValue() + " Current Balance: $" + df.format(currentAccount.getBalance()));
+            						ConsolePrinterUtility.header("account");
+                					do {
+                						ConsolePrinterUtility.menu(accountMenu);
+                						ConsolePrinterUtility.menuChoice(accountMenu.size());
+                						response = Integer.parseInt(in.nextLine().trim());
+                						if(response < minChoice || response > accountMenu.size()) {
+                							ConsolePrinterUtility.error("input");
+                						}
+                					} while(response < minChoice || response > accountMenu.size());
+                					switch(response) {
+                					case 1:
+                						transaction(TransactionType.DEPOSIT);
+                						break;
+                					case 2:
+                        				transaction(TransactionType.WITHDRAW);
+                        				break;
+                					case 3:
+                        				transaction(TransactionType.TRANSFER);
+                        				break;
+                					case 4:
+                        				ConsolePrinterUtility.header("transactions");
+                        				viewTransactions();
+                        				break;
+                					case 5:
+                						currentAccount = null;
+                						selectedAccount = false;
+                        				break;
+                					}
+            					}while(selectedAccount);
+        					}
+        				}while(wentToAccounts);
         			}
         		} while(loggedIn);
         	}
@@ -122,24 +178,15 @@ public class Main {
 	 * @param type the type of transaction 
 	 */
 	private static void transaction(TransactionType type) {
-		List<CustomerAccount> accounts = customerAccountRepo.getByCustomer(current.getUserId());
-		int i = 1, response = 0, second = 0;
+		int response = 0;
 		Double amount;
-		String accountMenu = "";
-		Account[] beingUsed = new Account[2];
+		Account beingUsed = null;
 		Transaction sent;
-		DecimalFormat df = new DecimalFormat("#,###,##0.00");
-		for(CustomerAccount ca : accounts) {
-			accountMenu += i + ". " + ca.getAccountId();
-			if(i != accounts.size()) {
-				accountMenu += "\n";
-			}
-			i++;
-		}
+		List<String> choices = new ArrayList<String>();
+		
 		if(type == TransactionType.TRANSFER && accounts.size() <= 1) {
 			ConsolePrinterUtility.error("number_of_accounts");
 		} else {
-			
 			ConsolePrinterUtility.header(type.getValue().toLowerCase());
 			
 			switch(type) {
@@ -151,23 +198,12 @@ public class Main {
 						ConsolePrinterUtility.error("input");
 					} 			
 				} while(amount <= 0.0);
-				ColorsUtility.colorDefault("Choose the Account to Deposit to:");
-				ConsolePrinterUtility.header("account");
-				do {
-					ColorsUtility.colorMenu(accountMenu);
-					ConsolePrinterUtility.menuChoice(accounts.size());
-					response = Integer.parseInt(in.nextLine().trim());
-					if(response < 1 || response > accounts.size()) {
-						ConsolePrinterUtility.error("input");
-					}
-				} while(response < 1 || response > accounts.size());
-				beingUsed[0] = accountRepo.getByNumber(accounts.get(response - 1).getAccountId());
-				sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Depositing funds of $" + df.format(amount), current.getUserId(), beingUsed[0].getAccountNumber()));
+				sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Depositing funds of $" + df.format(amount), currentCustomer.getUserId(), currentAccount.getAccountNumber()));
 				
 				ColorsUtility.colorOutput("Transaction Sent: ");
 				ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
-				beingUsed[0].setBalance(beingUsed[0].getBalance() + amount);
-				accountRepo.update(beingUsed[0], "balance");
+				currentAccount.setBalance(currentAccount.getBalance() + amount);
+				accountRepo.update(currentAccount, "balance");
 				break;
 			case WITHDRAW:
 				do {
@@ -177,27 +213,16 @@ public class Main {
 						ConsolePrinterUtility.error("input");
 					} 			
 				} while(amount <= 0.0);
-				ColorsUtility.colorDefault("Choose the Account to Withdraw from:");
-				ConsolePrinterUtility.header("account");
-				do {
-					ColorsUtility.colorMenu(accountMenu);
-					ConsolePrinterUtility.menuChoice(accounts.size());
-					response = Integer.parseInt(in.nextLine().trim());
-					if(response < 1 || response > accounts.size()) {
-						ConsolePrinterUtility.error("input");
-					}
-				} while(response < 1 || response > accounts.size());
-				beingUsed[0] = accountRepo.getByNumber(accounts.get(response - 1).getAccountId());
-				if(beingUsed[0].getBalance() < amount) {
+				if(currentAccount.getBalance() < amount) {
 					ConsolePrinterUtility.error("transaction");
 				} else {
 					amount *= -1;
-					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Withdrawing funds of $" + df.format(amount), current.getUserId(), beingUsed[0].getAccountNumber()));
+					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Withdrawing funds of $" + df.format(amount), currentCustomer.getUserId(), currentAccount.getAccountNumber()));
 					
 					ColorsUtility.colorOutput("Transaction Sent: ");
 					ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
-					beingUsed[0].setBalance(beingUsed[0].getBalance() + amount);
-					accountRepo.update(beingUsed[0], "balance");
+					currentAccount.setBalance(currentAccount.getBalance() + amount);
+					accountRepo.update(currentAccount, "balance");
 				}
 				break;
 			case TRANSFER:
@@ -208,46 +233,43 @@ public class Main {
 						ConsolePrinterUtility.error("input");
 					} 			
 				} while(amount <= 0.0);
-				ColorsUtility.colorDefault("Choose the Account to Transfer funds from:");
-				ConsolePrinterUtility.header("account");
-				do {
-					ColorsUtility.colorMenu(accountMenu);
-					ConsolePrinterUtility.menuChoice(accounts.size());
-					response = Integer.parseInt(in.nextLine().trim());
-					if(response < 1 || response > accounts.size()) {
-						ConsolePrinterUtility.error("input");
-					}
-				} while(response < 1 || response > accounts.size());
 				
-				ColorsUtility.colorDefault("Choose the Account to Transfer funds to:");				
-				ConsolePrinterUtility.header("account");
-				do {
-					ColorsUtility.colorMenu(accountMenu);
-					ConsolePrinterUtility.menuChoice(accounts.size());
-					second = Integer.parseInt(in.nextLine().trim());
-					if(second < 1 || second > accounts.size() || second == response) {
-						ConsolePrinterUtility.error("input");
-					}
-				} while(second < 1 || second > accounts.size() || second == response);
-				beingUsed[0] = accountRepo.getByNumber(accounts.get(response - 1).getAccountId());
-				beingUsed[1] = accountRepo.getByNumber(accounts.get(second - 1).getAccountId());
-				if(beingUsed[0].getBalance() < amount) {
+				if(currentAccount.getBalance() < amount) {
 					ConsolePrinterUtility.error("transaction");
 				} else {
+					for(CustomerAccount ca : currentCustomerAccounts) {
+						if(!currentAccount.getAccountNumber().equals(ca.getAccountId())) {
+							choices.add(ca.getAccountId());
+						}					
+					}
+					
+					ColorsUtility.colorDefault("Choose the Account to Transfer funds to:");				
+					ConsolePrinterUtility.header("accounts");
+					do {
+						ConsolePrinterUtility.menu(choices);
+						ConsolePrinterUtility.menuChoice(choices.size());
+						response = Integer.parseInt(in.nextLine().trim());
+						if(response < minChoice || response > choices.size()) {
+							ConsolePrinterUtility.error("input");
+						}
+					} while(response < minChoice || response > choices.size());
+					
+					beingUsed = accountRepo.getByNumber(choices.get(response - 1));
+					
 					amount *= -1;
-					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Transfer from " + beingUsed[0].getAccountNumber() + " to " + beingUsed[1].getAccountNumber(), current.getUserId(), beingUsed[0].getAccountNumber()));
+					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Transfer from " + currentAccount.getAccountNumber() + " to " + beingUsed.getAccountNumber(), currentCustomer.getUserId(), currentAccount.getAccountNumber()));
 					
 					ColorsUtility.colorOutput("Transaction Sent: ");
 					ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
-					beingUsed[0].setBalance(beingUsed[0].getBalance() + amount);
-					accountRepo.update(beingUsed[0], "balance");
+					currentAccount.setBalance(currentAccount.getBalance() + amount);
+					accountRepo.update(currentAccount, "balance");
 					amount *= -1;
-					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Transfer from " + beingUsed[0].getAccountNumber() + " to " + beingUsed[1].getAccountNumber(), current.getUserId(), beingUsed[1].getAccountNumber()));
+					sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, type, "Transfer from " + currentAccount.getAccountNumber() + " to " + beingUsed.getAccountNumber(), currentCustomer.getUserId(), beingUsed.getAccountNumber()));
 					
 					ColorsUtility.colorOutput("Transaction Sent: ");
 					ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
-					beingUsed[1].setBalance(beingUsed[1].getBalance() + amount);
-					accountRepo.update(beingUsed[1], "balance");
+					beingUsed.setBalance(beingUsed.getBalance() + amount);
+					accountRepo.update(beingUsed, "balance");
 				}				
 				break;
 			}
@@ -257,39 +279,17 @@ public class Main {
 	 * Displays the user info.
 	 */
 	private static void displayCustomer() {
-		Address address = addressRepo.getById(current.getAddressid());
-		ColorsUtility.colorOutput("Login Information:\nUser Id: " + current.getUserId() + " Password: " + current.getPassword() + "\nName: " + current.getFirstName() + ", " + current.getLastName() + "\nContact Information:\nEmail: " + current.getEmail() + " Phone Number: " + current.getPhoneNumber() + "\nAddress:\n" + address.getStreet() + " " + address.getCity() + ", " + address.getState() + " " + address.getZipcode());
+		Address address = addressRepo.getById(currentCustomer.getAddressid());
+		ColorsUtility.colorOutput("Login Information:\nUser Id: " + currentCustomer.getUserId() + " Password: " + currentCustomer.getPassword() + "\nName: " + currentCustomer.getFirstName() + ", " + currentCustomer.getLastName() + "\nContact Information:\nEmail: " + currentCustomer.getEmail() + " Phone Number: " + currentCustomer.getPhoneNumber() + "\nAddress:\n" + address.getStreet() + " " + address.getCity() + ", " + address.getState() + " " + address.getZipcode());
 	}
 	/**
 	 * Shows the users latest transactions.
 	 */
 	private static void viewTransactions() {
-		List<CustomerAccount> accounts = customerAccountRepo.getByCustomer(current.getUserId());
-		List<Transaction> list;
-		int i = 1, response = 0;
-		String accountMenu = "";
-		DecimalFormat df = new DecimalFormat("#,###,##0.00");
+		List<Transaction> list = new ArrayList<Transaction>();
 		
-		for(CustomerAccount ca : accounts) {
-			accountMenu += i + ". " + ca.getAccountId();
-			if(i != accounts.size()) {
-				accountMenu += "\n";
-			}
-			i++;
-		}
-		ColorsUtility.colorDefault("Choose the Account to view:");
-		ConsolePrinterUtility.header("account");
-		do {
-			ColorsUtility.colorMenu(accountMenu);
-			ConsolePrinterUtility.menuChoice(accounts.size());
-			response = Integer.parseInt(in.nextLine().trim());
-			if(response < 1 || response > accounts.size()) {
-				ConsolePrinterUtility.error("input");
-			}
-		} while(response < 1 || response > accounts.size());
-		
-		ColorsUtility.colorOutput("Account " + accounts.get(response - 1).getAccountId() + ":");
-		list = transactionRepo.getByAccount(accounts.get(response - 1).getAccountId());
+		ColorsUtility.colorOutput("Account " + currentAccount.getAccountNumber() + ":");
+		list = transactionRepo.getByAccount(currentAccount.getAccountNumber());
 		for(Transaction t : list) {
 			ColorsUtility.colorOutput("Date: " + t.getTimestamp() + " Type: " + t.getType() + " Description: " + t.getTransactionDesc() + " Amount: $" + df.format(t.getAmount()));
 		} 
@@ -324,7 +324,7 @@ public class Main {
 					ConsolePrinterUtility.error("login");
 					counter++;
 				} else {
-					current = customerRepo.getById(username);
+					currentCustomer = customerRepo.getById(username);
 					return true;
 				}				
 			} while(!temp.getPassword().equals(password));
@@ -441,7 +441,7 @@ public class Main {
 			address = addressRepo.add(new Address(0, street, city, state, zip));
 		}
 		
-		current = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
+		currentCustomer = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
 		
 		switch(accountType.charAt(0)) {
 		case 'c':
@@ -454,9 +454,9 @@ public class Main {
 		
 		account = accountRepo.add(account);
 		
-		customerAccountRepo.add(new CustomerAccount(0, current.getUserId(), account.getAccountNumber()));
+		customerAccountRepo.add(new CustomerAccount(0, currentCustomer.getUserId(), account.getAccountNumber()));
 		
-		transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", current.getUserId(), account.getAccountNumber()));
+		transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", currentCustomer.getUserId(), account.getAccountNumber()));
 		
 		return true;
 	}
