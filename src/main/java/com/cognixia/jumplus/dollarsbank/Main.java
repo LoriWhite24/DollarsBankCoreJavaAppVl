@@ -50,7 +50,7 @@ public class Main {
 	private static List<CustomerAccount> currentCustomerAccounts = null;
 	
 	@SuppressWarnings("serial")
-	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Back");}};
+	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Close Account"); add("Back");}};
 	private static DecimalFormat df = new DecimalFormat("#,###,##0.00");
 	private static final int minChoice = 1;
 	/**
@@ -60,7 +60,7 @@ public class Main {
 	public static void main(String[] args) {
 		boolean quit = false, loggedIn = false, wentToAccounts = false, selectedAccount = false;
 		int response;
-		
+
         //DatabaseSetupUtility.setup(".\\dollars_bank.sql");
         do {
         	DatabaseSetupUtility.clrscr();
@@ -75,12 +75,16 @@ public class Main {
         	} while(response > topMenu.size() || response < minChoice);
         	switch(response) {
         	case 1:
+        		DatabaseSetupUtility.clrscr();
         		ConsolePrinterUtility.header("new_account");
         		loggedIn = createNewAccount();
+        		DatabaseSetupUtility.clrscr();
         		break;
         	case 2:
+        		DatabaseSetupUtility.clrscr();
         		ConsolePrinterUtility.header("login");
         		loggedIn = login();
+        		DatabaseSetupUtility.clrscr();
         		break;
         	case 3:
         		quit = true;
@@ -99,6 +103,7 @@ public class Main {
         			} while(response > loggedInMenu.size() || response < minChoice);
         			switch(response) {
         			case 1:
+        				DatabaseSetupUtility.clrscr();
         				ConsolePrinterUtility.header("customer");
         				displayCustomer();
         				break;
@@ -109,6 +114,7 @@ public class Main {
         					accounts.add(ca.getAccountId());
         				}
         				accounts.add("Back");
+        				DatabaseSetupUtility.clrscr();
         				break;
         			case 3:
         				loggedIn = false;
@@ -133,38 +139,52 @@ public class Main {
         					} else {
             					currentAccount = accountRepo.getByNumber(currentCustomerAccounts.get(response - 1).getAccountId());
             					selectedAccount = true;
-            					do {
-            						ColorsUtility.colorDefault("Account " + currentAccount.getAccountNumber() + ":");
-            						ColorsUtility.colorOutput("Type: " + currentAccount.getType().getValue() + " Current Balance: $" + df.format(currentAccount.getBalance()));
-            						ConsolePrinterUtility.header("account");
-                					do {
-                						ConsolePrinterUtility.menu(accountMenu);
-                						ConsolePrinterUtility.menuChoice(accountMenu.size());
-                						response = Integer.parseInt(in.nextLine().trim());
-                						if(response < minChoice || response > accountMenu.size()) {
-                							ConsolePrinterUtility.error("input");
-                						}
-                					} while(response < minChoice || response > accountMenu.size());
-                					switch(response) {
-                					case 1:
-                						transaction(TransactionType.DEPOSIT);
-                						break;
-                					case 2:
-                        				transaction(TransactionType.WITHDRAW);
-                        				break;
-                					case 3:
-                        				transaction(TransactionType.TRANSFER);
-                        				break;
-                					case 4:
-                        				ConsolePrinterUtility.header("transactions");
-                        				viewTransactions();
-                        				break;
-                					case 5:
-                						currentAccount = null;
-                						selectedAccount = false;
-                        				break;
-                					}
-            					}while(selectedAccount);
+            					if(currentAccount.getDateClosed() == null) {
+            						do {
+                						ColorsUtility.colorDefault("Account " + currentAccount.getAccountNumber() + ":");
+                						ColorsUtility.colorOutput("Type: " + currentAccount.getType().getValue() + " Current Balance: $" + df.format(currentAccount.getBalance()));
+                						ConsolePrinterUtility.header("account");
+                    					do {
+                    						ConsolePrinterUtility.menu(accountMenu);
+                    						ConsolePrinterUtility.menuChoice(accountMenu.size());
+                    						response = Integer.parseInt(in.nextLine().trim());
+                    						if(response < minChoice || response > accountMenu.size()) {
+                    							ConsolePrinterUtility.error("input");
+                    						}
+                    					} while(response < minChoice || response > accountMenu.size());
+                    					switch(response) {
+                    					case 1:
+                    						DatabaseSetupUtility.clrscr();
+                    						transaction(TransactionType.DEPOSIT);
+                    						break;
+                    					case 2:
+                    						DatabaseSetupUtility.clrscr();
+                            				transaction(TransactionType.WITHDRAW);
+                            				break;
+                    					case 3:
+                    						DatabaseSetupUtility.clrscr();
+                            				transaction(TransactionType.TRANSFER);
+                            				break;
+                    					case 4:
+                    						DatabaseSetupUtility.clrscr();
+                            				ConsolePrinterUtility.header("transactions");
+                            				viewTransactions();
+                            				break;
+                    					case 5: 
+                    						DatabaseSetupUtility.clrscr();
+                    						selectedAccount = closeAccount();
+                    						break;
+                    					case 6:
+                    						currentAccount = null;
+                    						selectedAccount = false;
+                            				break;
+                    					}
+                					}while(selectedAccount);
+            					} else {
+            						DatabaseSetupUtility.clrscr();
+            						viewTransactions();
+            						openAccount();
+            					}            					
         					}
         				}while(wentToAccounts);
         			}
@@ -172,6 +192,66 @@ public class Main {
         	}
         } while(!quit);
         in.close();
+	}
+	/**
+	 * Reopens the current bank account the user has selected and makes sure the user wishes to reopens said account.
+	 */
+	private static void openAccount() {
+		String check = null;
+		Double amount;
+		Transaction sent;
+		do {
+			ColorsUtility.colorDefault("Are you sure you want to re-open this account? (Yes or No)");
+			check = in.nextLine().trim().toLowerCase().substring(0, 1);
+			if(!check.equals("y") && !check.equals("n")) {
+				ConsolePrinterUtility.error("input");
+			}
+		} while(!check.equals("y") && !check.equals("n"));
+		if(check.equals("y")) {
+			do {
+				ColorsUtility.colorDefault("Amount to Deposit:");
+				amount = Double.parseDouble(in.nextLine().trim());
+				if(amount <= 0.0) {
+					ConsolePrinterUtility.error("input");
+				} 			
+			} while(amount <= 0.0);
+			sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), amount, TransactionType.DEPOSIT, "Re-opening account " + currentAccount.getAccountNumber(), currentCustomer.getUserId(), currentAccount.getAccountNumber()));
+			ColorsUtility.colorOutput("Transaction Sent: ");
+			ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
+			currentAccount.setBalance(currentAccount.getBalance() + amount);
+			accountRepo.update(currentAccount, "balance");
+			currentAccount.setDateOpened(Timestamp.valueOf(LocalDateTime.now()));
+			accountRepo.update(currentAccount, "date_opened");
+			currentAccount.setDateClosed(null);
+			accountRepo.update(currentAccount, "date_closed");
+		}
+	}
+	/**
+	 * Closes the current bank account the user has selected and makes sure the user wishes to close said account.
+	 * @return boolean - whether the current account has been closed
+	 */
+	private static boolean closeAccount() {
+		String check = null;
+		Transaction sent;
+		do {
+			ColorsUtility.colorDefault("Are you sure you want to close this account? (Yes or No)");
+			check = in.nextLine().trim().toLowerCase().substring(0, 1);
+			if(!check.equals("y") && !check.equals("n")) {
+				ConsolePrinterUtility.error("input");
+			}
+		} while(!check.equals("y") && !check.equals("n"));
+		if(check.equals("n")) {
+			return true;
+		}
+		sent = transactionRepo.add(new Transaction(0, Timestamp.valueOf(LocalDateTime.now()), (currentAccount.getBalance() * -1), TransactionType.WITHDRAW, "Closing account " + currentAccount.getAccountNumber(), currentCustomer.getUserId(), currentAccount.getAccountNumber()));
+		ColorsUtility.colorOutput("Transaction Sent: ");
+		ColorsUtility.colorOutput("Date: " + sent.getTimestamp() + " Type: " + sent.getType() + " Description: " + sent.getTransactionDesc() + " Amount: $" + df.format(sent.getAmount()));
+		currentAccount.setBalance(currentAccount.getBalance() + (currentAccount.getBalance() * -1));
+		accountRepo.update(currentAccount, "balance");
+		currentAccount.setDateClosed(Timestamp.valueOf(LocalDateTime.now()));
+		accountRepo.update(currentAccount, "date_closed");
+		currentAccount = null;
+		return false;
 	}
 	/**
 	 * Prompts the user for an amount for the transaction that they have chosen. Will not allow transfers if they do not have more than one account.
@@ -287,8 +367,9 @@ public class Main {
 	 */
 	private static void viewTransactions() {
 		List<Transaction> list = new ArrayList<Transaction>();
-		
+		String status = currentAccount.getDateClosed() == null? "OPEN" : "CLOSED";
 		ColorsUtility.colorOutput("Account " + currentAccount.getAccountNumber() + ":");
+		ColorsUtility.colorOutput("Type: " + currentAccount.getType().getValue() + " Current Status: " + status);
 		list = transactionRepo.getByAccount(currentAccount.getAccountNumber());
 		for(Transaction t : list) {
 			ColorsUtility.colorOutput("Date: " + t.getTimestamp() + " Type: " + t.getType() + " Description: " + t.getTransactionDesc() + " Amount: $" + df.format(t.getAmount()));

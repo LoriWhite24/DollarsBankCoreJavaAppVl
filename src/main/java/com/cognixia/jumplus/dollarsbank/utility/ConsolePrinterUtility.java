@@ -70,7 +70,7 @@ public class ConsolePrinterUtility {
 	}
 	/**
 	 * Generates the menu, colors, and then prints it to the menu.
-	 * @param choice the menu type
+	 * @param choices the menu of choices to print
 	 */
 	public static void menu(List<String> choices) {
 		String menu = "";
