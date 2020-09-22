@@ -22,7 +22,7 @@
 6. Use JDBC and DAO to connect user info to a database.
 7. Extra Features:
    - [x] View All Accounts
-   - [ ] Open a new Account
+   - [ ] Open a new additional Account
    - [x] Reopen an existing Account that was closed
    - [x] Close an existing Account
    - [ ] Update Customer Profile
