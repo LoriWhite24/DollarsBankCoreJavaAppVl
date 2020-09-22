@@ -23,6 +23,7 @@
 7. Extra Features:
    - [x] View All Accounts
    - [ ] Open a new Account
+   - [ ] Reopen an existing Account that was closed
    - [ ] Close an existing Account
    - [ ] Update Customer Profile
    - [ ] Open a new Account with another existing customer
