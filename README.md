@@ -22,11 +22,11 @@
 6. Use JDBC and DAO to connect user info to a database.
 7. Extra Features:
    - [x] View All Accounts
-   - [ ] Open a new additional Account
+   - [x] Open a new additional Account
    - [x] Reopen an existing Account that was closed
    - [x] Close an existing Account
-   - [ ] Update Customer Profile
-   - [ ] Allow a customer to add another existing customer to their account
+   - [x] Update Customer Profile
+   - [x] Allow a customer to add another existing customer to their account
 
 ### Running dollarsbank.jar:
 1. Make sure your mysql server connection for localhost in ConnectionMangerProperties matches your localhost connection properties.
