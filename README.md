@@ -26,7 +26,7 @@
    - [x] Reopen an existing Account that was closed
    - [x] Close an existing Account
    - [ ] Update Customer Profile
-   - [ ] Open a new Account with another existing customer
+   - [ ] Allow a customer to add another existing customer to their account
 
 ### Running dollarsbank.jar:
 1. Make sure your mysql server connection for localhost in ConnectionMangerProperties matches your localhost connection properties.
