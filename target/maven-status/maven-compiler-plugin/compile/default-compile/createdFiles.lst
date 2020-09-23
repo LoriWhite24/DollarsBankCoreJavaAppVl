@@ -6,6 +6,7 @@ com\cognixia\jumplus\dollarsbank\model\CustomerAccount.class
 com\cognixia\jumplus\dollarsbank\config\ConnectionManagerProperties.class
 com\cognixia\jumplus\dollarsbank\model\Account.class
 com\cognixia\jumplus\dollarsbank\controller\TransactionController.class
+com\cognixia\jumplus\dollarsbank\Main$5.class
 com\cognixia\jumplus\dollarsbank\controller\AccountController.class
 com\cognixia\jumplus\dollarsbank\model\Transaction.class
 com\cognixia\jumplus\dollarsbank\dao\CustomerDAO.class

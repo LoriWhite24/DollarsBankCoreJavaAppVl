@@ -53,7 +53,7 @@ public class Main {
 	private static List<Customer> currentOtherCustomers = new ArrayList<Customer>();
 	
 	@SuppressWarnings("serial")
-	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Update Customer Information"); add("Open a New Bank Account"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Other Customers Linked to this Account"); add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Close Account"); add("Back");}}, currentOtherCustomersMenu = new ArrayList<String>(), namesMenu = new ArrayList<String>();
+	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Update Customer Information"); add("Open a New Bank Account"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Other Customers Linked to this Account"); add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Close Account"); add("Back");}}, currentOtherCustomersMenu = new ArrayList<String>(), namesMenu = new ArrayList<String>(), updateMenu = new ArrayList<String>() {{add("Password"); add("First Name"); add("Last Name"); add("Email"); add("Phone Number"); add("Address"); add("Back");}};
 	private static DecimalFormat df = new DecimalFormat("#,###,##0.00");
 	private static final int minChoice = 1;
 	/**
@@ -110,7 +110,7 @@ public class Main {
         				displayCustomer();
         				break;
         			case 2:
-        				
+        				updateCustomer();
         				break;
         			case 3:
         				ConsolePrinterUtility.header("new_account");
@@ -202,6 +202,132 @@ public class Main {
         in.close();
 	}
 	/**
+	 * Lets the current customer update their details.
+	 */
+	private static void updateCustomer() {
+		boolean doContinue = true;
+		int response = 0;
+		String password = "", fname = "", lname = "", email = "", phone = "", street = "", city = "", state = "", zip = "";
+		Pattern passPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,}$"), emailPattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"), phonePattern = Pattern.compile("^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"), streetPattern = Pattern.compile("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+)"), zipPattern = Pattern.compile("^[0-9]{5}(?:-[0-9]{4})?$"), statePattern = Pattern.compile("^[A-Z]{2}$");
+        Matcher matcher;
+        Address address;
+		do {
+			ConsolePrinterUtility.header("customer_update");
+			do {
+				ConsolePrinterUtility.menu(updateMenu);
+				ConsolePrinterUtility.menuChoice(updateMenu.size());
+				response = Integer.parseInt(in.nextLine().trim());
+				if(response < minChoice || response > updateMenu.size()) {
+					ConsolePrinterUtility.error("input");
+				}
+			} while(response < minChoice || response > updateMenu.size());
+			DatabaseSetupUtility.clrscr();
+			switch(response) {
+			case 1:
+				do {
+	        		ColorsUtility.colorDefault("Password: (must be at least 8 characters with a digit, a lowercase letter, an Uppercase letter, and a special character)");
+	        		password = in.nextLine().trim();
+	        		matcher = passPattern.matcher(password);
+	        		if(!matcher.matches()) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches());
+				currentCustomer.setPassword(password);
+				customerRepo.update(currentCustomer, "password");
+				break;
+			case 2:
+				do {
+	        		ColorsUtility.colorDefault("First Name:");
+	        		fname = in.nextLine().trim();
+	        		if(fname.equals("")) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(fname.equals(""));
+				currentCustomer.setFirstName(fname);
+				customerRepo.update(currentCustomer, "first_name");
+				break;
+			case 3:
+				do {
+	        		ColorsUtility.colorDefault("Last Name:");
+	        		lname = in.nextLine().trim();
+	        		if(lname.equals("")) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(lname.equals(""));
+				currentCustomer.setLastName(lname);
+				customerRepo.update(currentCustomer, "last_name");
+				break;
+			case 4:
+				do {
+	        		ColorsUtility.colorDefault("Email:");
+	        		email = in.nextLine().trim();
+	        		matcher = emailPattern.matcher(email);
+	        		if(!matcher.matches() || customerRepo.existsByEmail(email)) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches() || customerRepo.existsByEmail(email));
+				currentCustomer.setEmail(email);
+				customerRepo.update(currentCustomer, "email");
+				break;
+			case 5:
+				do {
+	        		ColorsUtility.colorDefault("Phone Number:");
+	        		phone = in.nextLine().trim();
+	        		matcher = phonePattern.matcher(phone);
+	        		if(!matcher.matches()) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches());
+				currentCustomer.setPhoneNumber(phone);
+				customerRepo.update(currentCustomer, "phone_number");
+				break;
+			case 6:
+				do {
+	        		ColorsUtility.colorDefault("Street Address:");
+	        		street = in.nextLine().trim();
+	        		matcher = streetPattern.matcher(street);
+	        		if(!matcher.matches()) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches());
+	        	do {
+	        		ColorsUtility.colorDefault("City:");
+	        		city = in.nextLine().trim();
+	        		if(city.equals("")) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(city.equals(""));
+	        	do {
+	        		ColorsUtility.colorDefault("State:");
+	        		state = in.nextLine().trim();
+	        		matcher = statePattern.matcher(state);
+	        		if(!matcher.matches()) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches());
+	        	do {
+	        		ColorsUtility.colorDefault("Zipcode:");
+	        		zip = in.nextLine().trim();
+	        		matcher = zipPattern.matcher(zip);
+	        		if(!matcher.matches()) {
+	        			ConsolePrinterUtility.error("input");
+	        		} 			
+	        	} while(!matcher.matches());
+	        	if(addressRepo.existsByStreetAndZipcode(street, zip)) {
+	        		address = addressRepo.getByStreetAndZipcode(street, zip);
+	        	} else {
+	        		address = addressRepo.add(new Address(0, street, city, state, zip));
+	        	}
+	        	currentCustomer.setAddressid(address.getAddressId());
+	        	customerRepo.update(currentCustomer, "address_id");
+				break;
+			case 7:
+				doContinue = false;
+				break;
+			}
+		} while(doContinue);
+	}
+	/**
 	 * Lets the current customer Add or Remove another customer from the current account selected.
 	 */
 	private static void otherCustomers() {
@@ -256,10 +382,10 @@ public class Main {
 							ColorsUtility.colorDefault("Enter their Email:");
 							email = in.nextLine().trim();
 							matcher = emailPattern.matcher(email);
-							if(!matcher.matches() || customerRepo.existsByEmail(email)) {
+							if(!matcher.matches() || !customerRepo.existsByEmail(email)) {
 								ConsolePrinterUtility.error("input");
 							} 			
-						} while(!matcher.matches() || customerRepo.existsByEmail(email));
+						} while(!matcher.matches() || !customerRepo.existsByEmail(email));
 						customerAccountRepo.add(new CustomerAccount(0, customerRepo.getByEmail(email).getUserId(), currentAccount.getAccountNumber()));
 					}					
 					break;

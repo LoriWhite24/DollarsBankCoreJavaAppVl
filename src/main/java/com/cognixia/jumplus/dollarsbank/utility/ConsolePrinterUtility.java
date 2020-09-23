@@ -34,6 +34,9 @@ public class ConsolePrinterUtility {
 		case "customer":
 			header = "+------------------+\n| Customer Details |\n+------------------+";
 			break;
+		case "customer_update":
+			header = "+-------------------------+\n| Update Customer Details |\n+-------------------------+";
+			break;
 		case "transactions":
 			header = "+---------------------+\n| Recent Transactions |\n+---------------------+";
 			break;
