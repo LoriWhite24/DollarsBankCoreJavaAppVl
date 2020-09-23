@@ -331,19 +331,25 @@ public class Main {
 	 * Lets the current customer Add or Remove another customer from the current account selected.
 	 */
 	private static void otherCustomers() {
-		int response = 0, i;
+		int response = 0, i, toRemove = 0;
 		boolean doContinue = true;
 		String check = null, email = "";
 		Pattern emailPattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
 		Matcher matcher;
 		Address address = null;
-		currentOtherCustomerAccounts = customerAccountRepo.getByAccount(currentAccount.getAccountNumber());
-		for(CustomerAccount ca : currentOtherCustomerAccounts) {
-			if(!currentCustomer.getUserId().equals(ca.getCustomerId())) {
-				currentOtherCustomers.add(customerRepo.getById(ca.getCustomerId()));
-			}
-		}
+		
 		do {
+			currentOtherCustomerAccounts = customerAccountRepo.getByAccount(currentAccount.getAccountNumber());
+			i = 0;
+			for(CustomerAccount ca : currentOtherCustomerAccounts) {
+				if(!currentCustomer.getUserId().equals(ca.getCustomerId())) {
+					currentOtherCustomers.add(customerRepo.getById(ca.getCustomerId()));
+				} else {
+					toRemove = i;
+				}
+				i++;
+			}
+			currentOtherCustomerAccounts.remove(toRemove);
 			currentOtherCustomersMenu.add("Add an Existing Customer to this Account");
 			if(currentOtherCustomers.size() > 0) {
 				currentOtherCustomersMenu.add("Remove a Customer from this Account");
