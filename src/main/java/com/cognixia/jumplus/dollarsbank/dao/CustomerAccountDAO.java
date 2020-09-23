@@ -28,4 +28,10 @@ public interface CustomerAccountDAO {
 	 * @return CustomerAccount - the added customer linked to an account
 	 */
 	public CustomerAccount add(CustomerAccount customerAccount);
+	/**
+	 * Removes a customer linking to an account.
+	 * @param id the id of a customer and an account to remove
+	 * @return boolean - whether the customer linking to an account was removed
+	 */
+	public boolean deleteById(int id);
 }

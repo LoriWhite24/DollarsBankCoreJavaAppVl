@@ -9,6 +9,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.text.DefaultEditorKit.CutAction;
+
 import com.cognixia.jumplus.dollarsbank.controller.AccountController;
 import com.cognixia.jumplus.dollarsbank.controller.AddressController;
 import com.cognixia.jumplus.dollarsbank.controller.CustomerAccountController;
@@ -47,10 +49,11 @@ public class Main {
 	private static Scanner in = new Scanner(System.in);
 	private static Customer currentCustomer = null;
 	private static Account currentAccount = null;
-	private static List<CustomerAccount> currentCustomerAccounts = null;
+	private static List<CustomerAccount> currentCustomerAccounts = null, currentOtherCustomerAccounts = null;
+	private static List<Customer> currentOtherCustomers = new ArrayList<Customer>();
 	
 	@SuppressWarnings("serial")
-	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Close Account"); add("Back");}};
+	private static List<String> topMenu = new ArrayList<String>() {{add("Sign Up"); add("Login"); add("Exit");}}, loggedInMenu = new ArrayList<String>() {{add("Display Customer Information"); add("Update Customer Information"); add("Open a New Bank Account"); add("Display Account(s)"); add("Sign Out");}}, accounts = new ArrayList<String>(), accountMenu = new ArrayList<String>() {{add("Other Customers Linked to this Account"); add("Deposit Amount"); add("Withdraw Amount"); add("Funds Transfer"); add("View Recent Transactions"); add("Close Account"); add("Back");}}, currentOtherCustomersMenu = new ArrayList<String>(), namesMenu = new ArrayList<String>();
 	private static DecimalFormat df = new DecimalFormat("#,###,##0.00");
 	private static final int minChoice = 1;
 	/**
@@ -155,26 +158,30 @@ public class Main {
                     					switch(response) {
                     					case 1:
                     						DatabaseSetupUtility.clrscr();
-                    						transaction(TransactionType.DEPOSIT);
+                    						otherCustomers();
                     						break;
                     					case 2:
                     						DatabaseSetupUtility.clrscr();
+                    						transaction(TransactionType.DEPOSIT);
+                    						break;
+                    					case 3:
+                    						DatabaseSetupUtility.clrscr();
                             				transaction(TransactionType.WITHDRAW);
                             				break;
-                    					case 3:
+                    					case 4:
                     						DatabaseSetupUtility.clrscr();
                             				transaction(TransactionType.TRANSFER);
                             				break;
-                    					case 4:
+                    					case 5:
                     						DatabaseSetupUtility.clrscr();
                             				ConsolePrinterUtility.header("transactions");
                             				viewTransactions();
                             				break;
-                    					case 5: 
+                    					case 6: 
                     						DatabaseSetupUtility.clrscr();
                     						selectedAccount = closeAccount();
                     						break;
-                    					case 6:
+                    					case 7:
                     						currentAccount = null;
                     						selectedAccount = false;
                             				break;
@@ -192,6 +199,109 @@ public class Main {
         	}
         } while(!quit);
         in.close();
+	}
+	/**
+	 * Lets the current customer Add or Remove another customer from the current account selected.
+	 */
+	private static void otherCustomers() {
+		int response = 0, i;
+		boolean doContinue = true;
+		String check = null, email = "";
+		Pattern emailPattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
+		Matcher matcher;
+		Address address = null;
+		currentOtherCustomerAccounts = customerAccountRepo.getByAccount(currentAccount.getAccountNumber());
+		for(CustomerAccount ca : currentOtherCustomerAccounts) {
+			if(!currentCustomer.getUserId().equals(ca.getCustomerId())) {
+				currentOtherCustomers.add(customerRepo.getById(ca.getCustomerId()));
+			}
+		}
+		do {
+			currentOtherCustomersMenu.add("Add an Existing Customer to this Account");
+			if(currentOtherCustomers.size() > 0) {
+				currentOtherCustomersMenu.add("Remove a Customer from this Account");
+				currentOtherCustomersMenu.add("Display all Other Customer(s) on this Account");
+				for(Customer c : currentOtherCustomers) {
+					namesMenu.add(c.getFirstName() + ", " + c.getLastName());
+				}
+			}
+			currentOtherCustomersMenu.add("Back");
+			ConsolePrinterUtility.header("account");
+			do {
+				ConsolePrinterUtility.menu(currentOtherCustomersMenu);
+				ConsolePrinterUtility.menuChoice(currentOtherCustomersMenu.size());
+				response = Integer.parseInt(in.nextLine().trim());
+				if(response < minChoice || response > currentOtherCustomersMenu.size()) {
+					ConsolePrinterUtility.error("input");
+				}
+			} while(response < minChoice || response > currentOtherCustomersMenu.size());
+			DatabaseSetupUtility.clrscr();
+			if(response == currentOtherCustomersMenu.size()) {
+				currentOtherCustomers.removeAll(currentOtherCustomers);
+				currentOtherCustomerAccounts = null;
+				doContinue = false;
+			} else {
+				switch(response) {
+				case 1:
+					do {
+						ColorsUtility.colorDefault("Are you sure you want to add an existing customer to this account? (Yes or No)");
+						check = in.nextLine().trim().toLowerCase().substring(0, 1);
+						if(!check.equals("y") && !check.equals("n")) {
+							ConsolePrinterUtility.error("input");
+						}
+					} while(!check.equals("y") && !check.equals("n"));
+					if(check.equals("y")) {
+						do {
+							ColorsUtility.colorDefault("Enter their Email:");
+							email = in.nextLine().trim();
+							matcher = emailPattern.matcher(email);
+							if(!matcher.matches() || customerRepo.existsByEmail(email)) {
+								ConsolePrinterUtility.error("input");
+							} 			
+						} while(!matcher.matches() || customerRepo.existsByEmail(email));
+						customerAccountRepo.add(new CustomerAccount(0, customerRepo.getByEmail(email).getUserId(), currentAccount.getAccountNumber()));
+					}					
+					break;
+				case 2:
+					do {
+						ColorsUtility.colorDefault("Are you sure you want to remove a customer from this account? (Yes or No)");
+						check = in.nextLine().trim().toLowerCase().substring(0, 1);
+						if(!check.equals("y") && !check.equals("n")) {
+							ConsolePrinterUtility.error("input");
+						}
+					} while(!check.equals("y") && !check.equals("n"));
+					if(check.equals("y")) {
+						DatabaseSetupUtility.clrscr();
+						ConsolePrinterUtility.header("customers");
+						do {
+							ConsolePrinterUtility.menu(namesMenu);
+							ConsolePrinterUtility.menuChoice(namesMenu.size());
+							response = Integer.parseInt(in.nextLine().trim());
+							if(response < minChoice || response > namesMenu.size()) {
+								ConsolePrinterUtility.error("input");
+							}
+						} while(response < minChoice || response > namesMenu.size());
+						customerAccountRepo.deleteById(currentOtherCustomerAccounts.get(response - 1).getCustomerAccountId());
+					}
+					break;
+				case 3:
+					i = 1;
+					ColorsUtility.colorDefault("Other Customer(s) on this Account:");
+					for(Customer c : currentOtherCustomers) {
+						address = addressRepo.getById(c.getAddressid());
+						ColorsUtility.colorOutput("Name: " + currentCustomer.getFirstName() + ", " + currentCustomer.getLastName() + "\nContact Information:\nEmail: " + currentCustomer.getEmail() + " Phone Number: " + currentCustomer.getPhoneNumber() + "\nAddress:\n" + address.getStreet() + " " + address.getCity() + ", " + address.getState() + " " + address.getZipcode());
+						if(currentOtherCustomers.size() != i) {
+							System.out.println();
+						}
+					}
+					break;
+				}
+			}		
+			currentOtherCustomersMenu.removeAll(currentOtherCustomersMenu);
+			if(currentOtherCustomers.size() > 0) {
+				namesMenu.removeAll(namesMenu);
+			}
+		} while(doContinue);
 	}
 	/**
 	 * Reopens the current bank account the user has selected and makes sure the user wishes to reopens said account.

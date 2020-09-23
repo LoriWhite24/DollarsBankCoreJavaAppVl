@@ -49,6 +49,9 @@ public class ConsolePrinterUtility {
 		case "account":
 			header = "+------------------+\n| Choose an Action |\n+------------------+";
 			break;
+		case "customers":
+			header = "+-----------------------------------+\n| Other Customer(s) on this Account |\n+-----------------------------------+";
+			break;
 		}
 		ColorsUtility.colorHeader(header);
 	}

@@ -108,4 +108,28 @@ public class CustomerAccountController implements CustomerAccountDAO{
 		}
 		return null;
 	}
+	/**
+	 * Removes a customer linking to an account.
+	 * @param id the id of a customer and an account to remove
+	 * @return boolean - whether the customer linking to an account was removed
+	 */
+	@Override
+	public boolean deleteById(int id) {
+		try(PreparedStatement pstmt = conn.prepareStatement("delete from dollars_bank.customer_account where customer_account_id = ?")) {
+
+			pstmt.setInt(1, id);
+
+			int deleted = pstmt.executeUpdate();
+
+			if(deleted > 0) {
+				return true;
+			}
+			pstmt.close();
+			
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+		}
+		return false;
+	}
 }
