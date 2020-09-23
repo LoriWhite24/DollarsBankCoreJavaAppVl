@@ -22,8 +22,11 @@ public class ConsolePrinterUtility {
 		case "logged_in":
 			header = "+-------------------+\n| Welcome Customer! |\n+-------------------+";
 			break;
-		case "new_account":
+		case "new_user_account":
 			header = "+---------------------------------------------+\n| Enter Details for New User and Bank Account |\n+---------------------------------------------+";
+			break;
+		case "new_account":
+			header = "+------------------------------------+\n| Enter Details for New Bank Account |\n+------------------------------------+";
 			break;
 		case "login":
 			header = "+---------------------+\n| Enter Login Details |\n+---------------------+";

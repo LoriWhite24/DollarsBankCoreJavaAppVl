@@ -76,15 +76,14 @@ public class Main {
             		ConsolePrinterUtility.error("input");
             	}
         	} while(response > topMenu.size() || response < minChoice);
+        	DatabaseSetupUtility.clrscr();
         	switch(response) {
         	case 1:
-        		DatabaseSetupUtility.clrscr();
-        		ConsolePrinterUtility.header("new_account");
-        		loggedIn = createNewAccount();
+        		ConsolePrinterUtility.header("new_user_account");
+        		loggedIn = createNewAccount(true);
         		DatabaseSetupUtility.clrscr();
         		break;
         	case 2:
-        		DatabaseSetupUtility.clrscr();
         		ConsolePrinterUtility.header("login");
         		loggedIn = login();
         		DatabaseSetupUtility.clrscr();
@@ -104,22 +103,28 @@ public class Main {
         					ConsolePrinterUtility.error("input");
         				}
         			} while(response > loggedInMenu.size() || response < minChoice);
+        			DatabaseSetupUtility.clrscr();
         			switch(response) {
         			case 1:
-        				DatabaseSetupUtility.clrscr();
         				ConsolePrinterUtility.header("customer");
         				displayCustomer();
         				break;
-        			case 2: 
+        			case 2:
+        				
+        				break;
+        			case 3:
+        				ConsolePrinterUtility.header("new_account");
+        				createNewAccount(false);
+        				break;
+        			case 4: 
         				wentToAccounts = true;
         				currentCustomerAccounts = customerAccountRepo.getByCustomer(currentCustomer.getUserId());
         				for(CustomerAccount ca : currentCustomerAccounts) {
         					accounts.add(ca.getAccountId());
         				}
         				accounts.add("Back");
-        				DatabaseSetupUtility.clrscr();
         				break;
-        			case 3:
+        			case 5:
         				loggedIn = false;
         				currentCustomer = null;
         				break;
@@ -135,6 +140,7 @@ public class Main {
         							ConsolePrinterUtility.error("input");
         						}
         					} while(response < minChoice || response > accounts.size());
+        					DatabaseSetupUtility.clrscr();
         					if(response == accounts.size()) {
         						accounts.removeAll(accounts);
         						currentCustomerAccounts = null;
@@ -155,30 +161,25 @@ public class Main {
                     							ConsolePrinterUtility.error("input");
                     						}
                     					} while(response < minChoice || response > accountMenu.size());
+                    					DatabaseSetupUtility.clrscr();
                     					switch(response) {
                     					case 1:
-                    						DatabaseSetupUtility.clrscr();
                     						otherCustomers();
                     						break;
                     					case 2:
-                    						DatabaseSetupUtility.clrscr();
                     						transaction(TransactionType.DEPOSIT);
                     						break;
                     					case 3:
-                    						DatabaseSetupUtility.clrscr();
                             				transaction(TransactionType.WITHDRAW);
                             				break;
                     					case 4:
-                    						DatabaseSetupUtility.clrscr();
                             				transaction(TransactionType.TRANSFER);
                             				break;
                     					case 5:
-                    						DatabaseSetupUtility.clrscr();
                             				ConsolePrinterUtility.header("transactions");
                             				viewTransactions();
                             				break;
                     					case 6: 
-                    						DatabaseSetupUtility.clrscr();
                     						selectedAccount = closeAccount();
                     						break;
                     					case 7:
@@ -289,7 +290,7 @@ public class Main {
 					ColorsUtility.colorDefault("Other Customer(s) on this Account:");
 					for(Customer c : currentOtherCustomers) {
 						address = addressRepo.getById(c.getAddressid());
-						ColorsUtility.colorOutput("Name: " + currentCustomer.getFirstName() + ", " + currentCustomer.getLastName() + "\nContact Information:\nEmail: " + currentCustomer.getEmail() + " Phone Number: " + currentCustomer.getPhoneNumber() + "\nAddress:\n" + address.getStreet() + " " + address.getCity() + ", " + address.getState() + " " + address.getZipcode());
+						ColorsUtility.colorOutput("Name: " + c.getFirstName() + ", " + c.getLastName() + "\nContact Information:\nEmail: " + c.getEmail() + " Phone Number: " + c.getPhoneNumber() + "\nAddress:\n" + address.getStreet() + " " + address.getCity() + ", " + address.getState() + " " + address.getZipcode());
 						if(currentOtherCustomers.size() != i) {
 							System.out.println();
 						}
@@ -523,10 +524,11 @@ public class Main {
 		return false;
 	}
 	/**
-	 * Prompts a user to create a new user account and a new bank account.
+	 * Prompts a user to create a new user account and or a new bank account.
+	 * @param createNewCustomer whether to prompt the user to add a new customer or not
 	 * @return boolean - whether the user is logged in
 	 */
-	private static boolean createNewAccount() {
+	private static boolean createNewAccount(boolean createNewCustomer) {
 		String accountType = "", username = "", password = "", fname = "", lname = "", email = "", phone = "", street = "", city = "", state = "", zip = "", accountNum = AccountNumberGeneratorUtility.generateNewAccountNumber();
 		Timestamp dateO = Timestamp.valueOf(LocalDateTime.now());
 		Double amount = 0.0;
@@ -534,120 +536,136 @@ public class Main {
         Matcher matcher;
         Address address;
         Account account = null;
-		
-		do {
-			ColorsUtility.colorDefault("User Id: (must be at least 8 characters)");
-			username = in.nextLine().trim();
-			if(username.length() < 8 || customerRepo.existsById(username)) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(username.length() < 8 || customerRepo.existsById(username));
-		do {
-			ColorsUtility.colorDefault("Password: (must be at least 8 characters with a digit, a lowercase letter, an Uppercase letter, and a special character)");
-			password = in.nextLine().trim();
-			matcher = passPattern.matcher(password);
-			if(!matcher.matches()) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches());
-		do {
-			ColorsUtility.colorDefault("First Name:");
-			fname = in.nextLine().trim();
-			if(fname.equals("")) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(fname.equals(""));
-		do {
-			ColorsUtility.colorDefault("Last Name:");
-			lname = in.nextLine().trim();
-			if(lname.equals("")) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(lname.equals(""));
-		do {
-			ColorsUtility.colorDefault("Email:");
-			email = in.nextLine().trim();
-			matcher = emailPattern.matcher(email);
-			if(!matcher.matches() || customerRepo.existsByEmail(email)) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches() || customerRepo.existsByEmail(email));
-		do {
-			ColorsUtility.colorDefault("Phone Number:");
-			phone = in.nextLine().trim();
-			matcher = phonePattern.matcher(phone);
-			if(!matcher.matches()) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches());
-		do {
-			ColorsUtility.colorDefault("Street Address:");
-			street = in.nextLine().trim();
-			matcher = streetPattern.matcher(street);
-			if(!matcher.matches()) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches());
-		do {
-			ColorsUtility.colorDefault("City:");
-			city = in.nextLine().trim();
-			if(city.equals("")) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(city.equals(""));
-		do {
-			ColorsUtility.colorDefault("State:");
-			state = in.nextLine().trim();
-			matcher = statePattern.matcher(state);
-			if(!matcher.matches()) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches());
-		do {
-			ColorsUtility.colorDefault("Zipcode:");
-			zip = in.nextLine().trim();
-			matcher = zipPattern.matcher(zip);
-			if(!matcher.matches()) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(!matcher.matches());
-		do {
-			ColorsUtility.colorDefault("Account Type:");
-			accountType = in.nextLine().trim().toLowerCase();
-			if(accountType.charAt(0) != 'c' && accountType.charAt(0) != 's') {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(accountType.charAt(0) != 'c' && accountType.charAt(0) != 's');
-		do {
-			ColorsUtility.colorDefault("Initial Amount:");
-			amount = Double.parseDouble(in.nextLine().trim());
-			if(amount <= 0.0) {
-				ConsolePrinterUtility.error("input");
-			} 			
-		} while(amount <= 0.0);
-		
-		if(addressRepo.existsByStreetAndZipcode(street, zip)) {
-			address = addressRepo.getByStreetAndZipcode(street, zip);
-		} else {
-			address = addressRepo.add(new Address(0, street, city, state, zip));
+		boolean checked = true;
+		String check = null;
+        
+        if(createNewCustomer) {
+        	do {
+        		ColorsUtility.colorDefault("User Id: (must be at least 8 characters)");
+        		username = in.nextLine().trim();
+        		if(username.length() < 8 || customerRepo.existsById(username)) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(username.length() < 8 || customerRepo.existsById(username));
+        	do {
+        		ColorsUtility.colorDefault("Password: (must be at least 8 characters with a digit, a lowercase letter, an Uppercase letter, and a special character)");
+        		password = in.nextLine().trim();
+        		matcher = passPattern.matcher(password);
+        		if(!matcher.matches()) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches());
+        	do {
+        		ColorsUtility.colorDefault("First Name:");
+        		fname = in.nextLine().trim();
+        		if(fname.equals("")) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(fname.equals(""));
+        	do {
+        		ColorsUtility.colorDefault("Last Name:");
+        		lname = in.nextLine().trim();
+        		if(lname.equals("")) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(lname.equals(""));
+        	do {
+        		ColorsUtility.colorDefault("Email:");
+        		email = in.nextLine().trim();
+        		matcher = emailPattern.matcher(email);
+        		if(!matcher.matches() || customerRepo.existsByEmail(email)) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches() || customerRepo.existsByEmail(email));
+        	do {
+        		ColorsUtility.colorDefault("Phone Number:");
+        		phone = in.nextLine().trim();
+        		matcher = phonePattern.matcher(phone);
+        		if(!matcher.matches()) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches());
+        	do {
+        		ColorsUtility.colorDefault("Street Address:");
+        		street = in.nextLine().trim();
+        		matcher = streetPattern.matcher(street);
+        		if(!matcher.matches()) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches());
+        	do {
+        		ColorsUtility.colorDefault("City:");
+        		city = in.nextLine().trim();
+        		if(city.equals("")) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(city.equals(""));
+        	do {
+        		ColorsUtility.colorDefault("State:");
+        		state = in.nextLine().trim();
+        		matcher = statePattern.matcher(state);
+        		if(!matcher.matches()) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches());
+        	do {
+        		ColorsUtility.colorDefault("Zipcode:");
+        		zip = in.nextLine().trim();
+        		matcher = zipPattern.matcher(zip);
+        		if(!matcher.matches()) {
+        			ConsolePrinterUtility.error("input");
+        		} 			
+        	} while(!matcher.matches());
+        	if(addressRepo.existsByStreetAndZipcode(street, zip)) {
+        		address = addressRepo.getByStreetAndZipcode(street, zip);
+        	} else {
+        		address = addressRepo.add(new Address(0, street, city, state, zip));
+        	}
+
+        	currentCustomer = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
+        } else {
+    		do {
+    			ColorsUtility.colorDefault("Are you sure you want to add a new bank account? (Yes or No)");
+    			check = in.nextLine().trim().toLowerCase().substring(0, 1);
+    			if(!check.equals("y") && !check.equals("n")) {
+    				ConsolePrinterUtility.error("input");
+    			}
+    		} while(!check.equals("y") && !check.equals("n"));
+    		if(check.equals("n")) {
+    			checked = false;
+    		}
+        }
+		if(checked) {
+			do {
+				ColorsUtility.colorDefault("Account Type:");
+				accountType = in.nextLine().trim().toLowerCase();
+				if(accountType.charAt(0) != 'c' && accountType.charAt(0) != 's') {
+					ConsolePrinterUtility.error("input");
+				} 			
+			} while(accountType.charAt(0) != 'c' && accountType.charAt(0) != 's');
+			do {
+				ColorsUtility.colorDefault("Initial Amount:");
+				amount = Double.parseDouble(in.nextLine().trim());
+				if(amount <= 0.0) {
+					ConsolePrinterUtility.error("input");
+				} 			
+			} while(amount <= 0.0);
+
+			switch(accountType.charAt(0)) {
+			case 'c':
+				account = new CheckingAccount(accountNum, dateO, null, amount);
+				break;
+			case 's':
+				account = new SavingsAccount(accountNum, dateO, null, amount);
+				break;
+			}
+
+			account = accountRepo.add(account);
+
+			customerAccountRepo.add(new CustomerAccount(0, currentCustomer.getUserId(), account.getAccountNumber()));
+
+			transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", currentCustomer.getUserId(), account.getAccountNumber()));
 		}
-		
-		currentCustomer = customerRepo.add(new Customer(username, password, fname, lname, email, phone, address.getAddressId()));
-		
-		switch(accountType.charAt(0)) {
-		case 'c':
-			account = new CheckingAccount(accountNum, dateO, null, amount);
-			break;
-		case 's':
-			account = new SavingsAccount(accountNum, dateO, null, amount);
-			break;
-		}
-		
-		account = accountRepo.add(account);
-		
-		customerAccountRepo.add(new CustomerAccount(0, currentCustomer.getUserId(), account.getAccountNumber()));
-		
-		transactionRepo.add(new Transaction(0, dateO, amount, TransactionType.DEPOSIT, "Initial Deposit", currentCustomer.getUserId(), account.getAccountNumber()));
 		
 		return true;
 	}
