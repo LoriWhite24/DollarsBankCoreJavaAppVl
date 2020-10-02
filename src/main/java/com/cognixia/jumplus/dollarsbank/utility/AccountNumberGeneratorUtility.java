@@ -20,12 +20,13 @@ public class AccountNumberGeneratorUtility {
 		
 		Random r = new Random();
 		
-		int length = r.nextInt((17 - 8) + 1) + 8;
+		int length;
 		Integer digit;
 		
 		String number = "";
 		
 		do {
+			length = r.nextInt((17 - 8) + 1) + 8;
 			for(int i = 0; i < length; i++)
 			{
 				digit = r.nextInt(10);
